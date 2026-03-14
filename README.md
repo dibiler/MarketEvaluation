@@ -2,6 +2,34 @@
 
 A CLI project for retrieving global market historical data and testing investing strategies.
 
+## What's new
+
+- Multi-strategy runs with `-strategy all` (SMA, BUYHOLD, RSI in one execution).
+- Recommendation output per symbol and per strategy: `BUY`, `SELL`, `KEEP`.
+- Default recommendation timing is now `next-day-safe`.
+- Multi-strategy CSV exports:
+  - detailed rows in your `-out` file
+  - aggregated strategy summary in `*_summary.csv`
+- End date defaults to the current date when `-end` is omitted.
+
+Quick examples:
+
+```bash
+# Run all strategies and export both detailed + summary CSVs
+go run ./cmd/backtester \
+  -strategy all \
+  -symbols "SPY.US,VGK.US,EWJ.US,GLD.US" \
+  -start "2018-01-01" \
+  -out compare.csv
+
+# Override recommendation timing to end-of-close mode
+go run ./cmd/backtester \
+  -strategy all \
+  -symbols "SPY.US,GLD.US" \
+  -start "2024-01-01" \
+  -recommendation-timing close
+```
+
 ## What it does
 
 - Downloads daily historical candles from Stooq (free global market source).
@@ -164,8 +192,7 @@ Compare all strategies in one run:
 go run ./cmd/backtester \
   -strategy all \
   -symbols "SPY.US,VGK.US,EWJ.US,GLD.US" \
-  -start "2018-01-01" \
-  -end "2026-03-14"
+  -start "2018-01-01"
 ```
 
 Comparison mode behavior:
@@ -228,8 +255,7 @@ go run ./cmd/backtester \
   -use-markets \
   -markets-file markets.csv \
   -isins "US78462F1030,US9220428745" \
-  -start "2018-01-01" \
-  -end "2026-03-14"
+  -start "2018-01-01"
 ```
 
 Makefile shortcut for catalog run:
