@@ -141,6 +141,7 @@ go run ./cmd/backtester -strategy sma
 go run ./cmd/backtester -strategy buyhold
 go run ./cmd/backtester -strategy rsi
 go run ./cmd/backtester -strategy rsi -rsi-period 14 -rsi-oversold 30 -rsi-overbought 70
+go run ./cmd/backtester -strategy all
 ```
 
 Or with Makefile shortcut:
@@ -154,7 +155,30 @@ Makefile shortcut for buy-and-hold:
 ```bash
 make run-buyhold
 make run-rsi
+make run-compare
 ```
+
+Compare all strategies in one run:
+
+```bash
+go run ./cmd/backtester \
+  -strategy all \
+  -symbols "SPY.US,VGK.US,EWJ.US,GLD.US" \
+  -start "2018-01-01" \
+  -end "2026-03-14"
+```
+
+Comparison mode behavior:
+
+- Runs `sma`, `buyhold`, and `rsi` over the same loaded symbol set.
+- Prints each strategy's normal per-symbol table.
+- Prints a final strategy comparison table with equal-weight averages.
+- Prints a recommendation summary for each strategy with per-symbol `BUY/SELL/KEEP` actions.
+- Prints a final recommendation (`BUY`, `SELL`, or `KEEP`) for each strategy.
+- Uses recommendation timing mode `next-day-safe` by default (uses the prior signal to avoid look-ahead interpretation).
+- You can override with `-recommendation-timing close`.
+- Supports `-out` CSV export with all strategies in one file (includes a `strategy` column).
+- Also writes a second summary CSV (`*_summary.csv`) with one row per strategy, average metrics, and recommendation columns (`buy_count`, `sell_count`, `keep_count`, `final_recommendation`).
 
 Example with custom symbols and date range:
 
@@ -162,13 +186,16 @@ Example with custom symbols and date range:
 go run ./cmd/backtester \
   -symbols "SPY.US,VGK.US,EWJ.US,EEM.US,TLT.US,GLD.US" \
   -start "2018-01-01" \
-  -end "2026-03-14" \
   -short 20 \
   -long 100 \
   -cash 10000 \
   -fee-bps 5 \
   -out report.csv
 ```
+
+Date defaults:
+
+- If `-end` is not provided, it defaults to the current date.
 
 ## Markets catalog with ISIN
 
